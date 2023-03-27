@@ -1,1 +1,2 @@
-admin\inc\config.php
+# Auto detect text files and perform LF normalization
+* text=auto
