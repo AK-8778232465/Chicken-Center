@@ -1,5 +1,11 @@
 <?php require_once('header.php'); ?>
-
+<?php
+use PHPMailer\PHPMailer\PHPMailer;
+//use mailer\src\Exception;
+require '../mailer/src/PHPMailer.php';
+require '../mailer/src/Exception.php';
+require '../mailer/src/SMTP.php';
+?>
 <?php
 $error_message = '';
 if(isset($_POST['form1'])) {
@@ -39,34 +45,34 @@ if(isset($_POST['form1'])) {
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);                            
         foreach ($result as $row) {
         	
-        	if($row['payment_method'] == 'PayPal'):
-        		$payment_details = '
-Transaction Id: '.$row['txnid'].'<br>
-        		';
-        	elseif($row['payment_method'] == 'Stripe'):
-				$payment_details = '
-Transaction Id: '.$row['txnid'].'<br>
-Card number: '.$row['card_number'].'<br>
-Card CVV: '.$row['card_cvv'].'<br>
-Card Month: '.$row['card_month'].'<br>
-Card Year: '.$row['card_year'].'<br>
-        		';
-        	elseif($row['payment_method'] == 'Bank Deposit'):
-				$payment_details = '
-Transaction Details: <br>'.$row['bank_transaction_info'];
-        	endif;
+//         	if($row['payment_method'] == 'PayPal'):
+//         		$payment_details = '
+// Transaction Id: '.$row['txnid'].'<br>
+//         		';
+//         	elseif($row['payment_method'] == 'Stripe'):
+// 				$payment_details = '
+// Transaction Id: '.$row['txnid'].'<br>
+// Card number: '.$row['card_number'].'<br>
+// Card CVV: '.$row['card_cvv'].'<br>
+// Card Month: '.$row['card_month'].'<br>
+// Card Year: '.$row['card_year'].'<br>
+//         		';
+//         	elseif($row['payment_method'] == 'Bank Deposit'):
+// 				$payment_details = '
+// Transaction Details: <br>'.$row['bank_transaction_info'];
+//         	endif;
 
-            $order_detail .= '
-Customer Name: '.$row['customer_name'].'<br>
-Customer Email: '.$row['customer_email'].'<br>
-Payment Method: '.$row['payment_method'].'<br>
-Payment Date: '.$row['payment_date'].'<br>
-Payment Details: <br>'.$payment_details.'<br>
-Paid Amount: '.$row['paid_amount'].'<br>
-Payment Status: '.$row['payment_status'].'<br>
-Shipping Status: '.$row['shipping_status'].'<br>
-Payment Id: '.$row['payment_id'].'<br>
-            ';
+//             $order_detail .= '
+// Customer Name: '.$row['customer_name'].'<br>
+// Customer Email: '.$row['customer_email'].'<br>
+// Payment Method: '.$row['payment_method'].'<br>
+// Payment Date: '.$row['payment_date'].'<br>
+// Payment Details: <br>'.$payment_details.'<br>
+// Paid Amount: '.$row['paid_amount'].'<br>
+// Payment Status: '.$row['payment_status'].'<br>
+// Shipping Status: '.$row['shipping_status'].'<br>
+// Payment Id: '.$row['payment_id'].'<br>
+//             ';
         }
 
         $i=0;
@@ -78,8 +84,6 @@ Payment Id: '.$row['payment_id'].'<br>
             $order_detail .= '
 <br><b><u>Product Item '.$i.'</u></b><br>
 Product Name: '.$row['product_name'].'<br>
-Size: '.$row['size'].'<br>
-Color: '.$row['color'].'<br>
 Quantity: '.$row['quantity'].'<br>
 Unit Price: '.$row['unit_price'].'<br>
             ';
@@ -89,25 +93,53 @@ Unit Price: '.$row['unit_price'].'<br>
         $statement->execute(array($subject_text,$message_text,$order_detail,$_POST['cust_id']));
 
         // sending email
-        $to_customer = $cust_email;
-        $message = '
-<html><body>
-<h3>Message: </h3>
-'.$message_text.'
-<h3>Order Details: </h3>
-'.$order_detail.'
-</body></html>
-';
-        $headers = 'From: ' . $admin_email . "\r\n" .
-                   'Reply-To: ' . $admin_email . "\r\n" .
-                   'X-Mailer: PHP/' . phpversion() . "\r\n" . 
-                   "MIME-Version: 1.0\r\n" . 
-                   "Content-Type: text/html; charset=ISO-8859-1\r\n";
+        require_once('../vendor/autoload.php');
+        $mail = new PHPMailer();
+ 
+        $mail->CharSet =  "utf-8";
+        $mail->IsSMTP();
+        // enable SMTP authentication
+        $mail->SMTPAuth = true;                  
+        // GMAIL username
+        $mail->Username = "theenderxxx@gmail.com";
+        // GMAIL password
+        $mail->Password = "xojlkxhqwmkdtgxm";
+        $mail->SMTPSecure = "ssl";  
+        // sets GMAIL as the SMTP server
+        $mail->Host = "smtp.gmail.com";
+        // set the SMTP port for the GMAIL server
+        $mail->Port = "465";
+        $mail->From='support@dream-dev.in';
+        $mail->FromName='Support @ Dream Dev';
+
+        $mail->AddAddress($cust_email);
+        $mail->Subject  =  "ABC Chicken";
+        $mail->IsHTML(true);
+        $mail->Body    = '
+        <html><body>
+        <h3>Message: </h3>
+        '.$message_text.'
+        <h3>Order Details: </h3>
+        '.$order_detail.'
+        </body></html>
+        ';
+        if($mail->Send())
+        {
+            $success_message = 'Your email to customer is sent successfully.';
+        } else {
+            $success_message = "";
+        }
+
+        // $headers = 'From: ' . $admin_email . "\r\n" .
+        //            'Reply-To: ' . $admin_email . "\r\n" .
+        //            'X-Mailer: PHP/' . phpversion() . "\r\n" . 
+        //            "MIME-Version: 1.0\r\n" . 
+        //            "Content-Type: text/html; charset=ISO-8859-1\r\n";
 
         // Sending email to admin                  
-        mail($to_customer, $subject_text, $message, $headers);
+        // mail($to_customer, $subject_text, $message, $headers);
         
-        $success_message = 'Your email to customer is sent successfully.';
+    
 
     }
 }
@@ -148,7 +180,7 @@ if($success_message != '') {
                     </th>
                     <th>Paid Amount</th>
                     <th>Payment Status</th>
-                    <th>Shipping Status</th>
+                    <th>Delivery Status</th>
 			        <th>Action</th>
 			    </tr>
 			</thead>
@@ -213,8 +245,6 @@ if($success_message != '') {
                            $result1 = $statement1->fetchAll(PDO::FETCH_ASSOC);
                            foreach ($result1 as $row1) {
                                 echo '<b>Product:</b> '.$row1['product_name'];
-                                echo '<br>(<b>Size:</b> '.$row1['size'];
-                                echo ', <b>Color:</b> '.$row1['color'].')';
                                 echo '<br>(<b>Quantity:</b> '.$row1['quantity'];
                                 echo ', <b>Unit Price:</b> '.$row1['unit_price'].')';
                                 echo '<br><br>';

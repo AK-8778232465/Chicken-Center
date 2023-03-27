@@ -1,4 +1,5 @@
-<?php
+<?php  
+
 ob_start();
 session_start();
 include("../../admin/inc/config.php");
@@ -15,8 +16,8 @@ foreach ($result as $row) {
 ?>
 <?php
 if( !isset($_REQUEST['msg']) ) {
-	if(empty($_POST['transaction_info'])) {
-		header('location: ../../checkout.php');
+	if(empty($_POST['final_total'])) {
+		header('location: ../../chckout.php');
 	} else {
 		$payment_date = date('Y-m-d H:i:s');
 	    $payment_id = time();
@@ -44,13 +45,13 @@ if( !isset($_REQUEST['msg']) ) {
 	                            $_SESSION['customer']['cust_email'],
 	                            $payment_date,
 	                            '',
-	                            $_POST['amount'],
+	                            $_POST['final_total'],
 	                            '', 
 	                            '',
 	                            '', 
 	                            '',
-	                            $_POST['transaction_info'],
-	                            'Bank Deposit',
+	                            '',
+	                            '',
 	                            'Pending',
 	                            'Pending',
 	                            $payment_id
@@ -102,7 +103,7 @@ if( !isset($_REQUEST['msg']) ) {
 	                        unit_price, 
 	                        payment_id
 	                        ) 
-	                        VALUES (?,?,?,?,?,?,?)");
+	                        VALUES (?,?,?,?,?)");
 	        $sql = $statement->execute(array(
 	                        $arr_cart_p_id[$i],
 	                        $arr_cart_p_name[$i],
@@ -127,11 +128,27 @@ if( !isset($_REQUEST['msg']) ) {
 	    }
 	    unset($_SESSION['cart_p_id']);
 	    unset($_SESSION['cart_p_qty']);
-	    unset($_SESSION['cart_p_current_price']);
+
 	    unset($_SESSION['cart_p_name']);
 	    unset($_SESSION['cart_p_featured_photo']);
+		unset($_SESSION['cart_p_current_price']);
 
-	    header('location: ../../payment_success.php');
+		global $FinalAmt;
+
+		$FinalAmt = $_POST['final_total']
+
 	}
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Created</title>
+</head>
+<body>
+    <h1>Order Created Successfully</h1>
+</body>
+</html>

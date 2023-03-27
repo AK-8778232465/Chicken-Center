@@ -239,12 +239,12 @@ if(!isset($_SESSION['cart_p_id'])) {
 	                                    <label for=""><?php echo LANG_VALUE_34; ?> *</label>
 	                                    <select name="payment_method" class="form-control select2" id="advFieldsStatus">
 	                                        <option value=""><?php echo LANG_VALUE_35; ?></option>
-	                                        <option value="PayPal"><?php echo LANG_VALUE_36; ?></option>
-	                                        <option value="Bank Deposit"><?php echo LANG_VALUE_38; ?></option>
+	                                        <option value="RazorPay"><?php echo LANG_VALUE_36; ?></option>
+	                                        <option value="Cash on Delivery"><?php echo LANG_VALUE_38; ?></option>
 	                                    </select>
 	                                </div>
 
-                                    <form class="paypal" action="<?php echo BASE_URL; ?>payment/paypal/payment_process.php" method="post" id="paypal_form" target="_blank">
+                                    <!-- <form class="paypal" action="<?php echo BASE_URL; ?>payment/paypal/payment_process.php" method="post" id="paypal_form" target="_blank">
                                         <input type="hidden" name="cmd" value="_xclick" />
                                         <input type="hidden" name="no_note" value="1" />
                                         <input type="hidden" name="lc" value="UK" />
@@ -255,9 +255,18 @@ if(!isset($_SESSION['cart_p_id'])) {
                                         <div class="col-md-12 form-group">
                                             <input type="submit" class="btn btn-primary" value="<?php echo LANG_VALUE_46; ?>" name="form1">
                                         </div>
+                                    </form> -->
+
+                                    <form class="RazorPay" action="<?php echo BASE_URL; ?>payment/razorpay/order_process.php" method="post" id="RazorPay_form" target="_blank">
+                                        <input type="hidden" name="final_total" value="<?php echo "$final_total"?>" />
+                                        <input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynow_LG.gif:NonHostedGuest" />
+                                        <div class="col-md-12 form-group">
+                                            <input type="submit" class="btn btn-primary" value="<?php echo LANG_VALUE_46; ?>" name="form1">
+                                        </div>
                                     </form>
 
-                                    <form action="payment/bank/init.php" method="post" id="bank_form">
+
+                                    <!-- <form action="payment/bank/init.php" method="post" id="bank_form">
                                         <input type="hidden" name="amount" value="<?php echo $final_total; ?>">
                                         <div class="col-md-12 form-group">
                                             <label for=""><?php echo LANG_VALUE_43; ?></span></label><br>
@@ -277,7 +286,7 @@ if(!isset($_SESSION['cart_p_id'])) {
                                         <div class="col-md-12 form-group">
                                             <input type="submit" class="btn btn-primary" value="<?php echo LANG_VALUE_46; ?>" name="form3">
                                         </div>
-                                    </form>
+                                    </form> -->
 
 
 	                                
