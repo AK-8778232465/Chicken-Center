@@ -135,7 +135,7 @@ if( !isset($_REQUEST['msg']) ) {
 
 		global $FinalAmt;
 
-		$FinalAmt = $_POST['final_total']
+		$FinalAmt = $_POST['final_total'];
 
 	}
 }
