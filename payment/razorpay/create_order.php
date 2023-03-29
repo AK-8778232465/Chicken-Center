@@ -1,9 +1,9 @@
 <?php  
     namespace Razorpay\Api;
-
+   
     include '../../vendor/razorpay/razorpay/Razorpay.php';
 
-    $api = new Api("rzp_test_TrmtN5S7FTrSpH", "Vi9DlT4zXo0FkExlckgJk0UA");
+    $api = new Api("rzp_test_ZRnhjkjRy355YS", "1xkRWUOZ12kwgsdZ8CdsiLLt");
     $currency = "INR";
     $amount = $FinalAmt;
 
@@ -14,7 +14,7 @@
 
     $api->order->create($orderData);
 
-    unset($_SESSION['cart_p_current_price']);
+    
     header('location: ../../payment_success.php');
 ?>
 <!DOCTYPE html>
@@ -26,6 +26,6 @@
     <title>Order Created</title>
 </head>
 <body>
-    <h1>Order Created Successfully</h1>
+    <h1>Order Created Successfully <?php echo $amount; ?></h1>
 </body>
 </html>

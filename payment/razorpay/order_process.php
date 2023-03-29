@@ -1,9 +1,25 @@
 <?php  
+    // namespace Razorpay\Api;
+	include '../../vendor/razorpay/razorpay/Razorpay.php';
+	ob_start();
+	session_start();
+	include("../../admin/inc/config.php");
+	include("../../admin/inc/functions.php");
+    include '../../vendor/razorpay/razorpay/Razorpay.php';
 
-ob_start();
-session_start();
-include("../../admin/inc/config.php");
-include("../../admin/inc/functions.php");
+    $api = new Razorpay\Api\Api("rzp_test_ZRnhjkjRy355YS", "1xkRWUOZ12kwgsdZ8CdsiLLt");
+    $currency = "INR";
+    $amount = $_POST['final_total'];
+	$orderID = uniqid('ABC_');
+
+    $orderData = [
+		'id'			  => $orderID,
+        'amount'          => $amount,
+        'currency'        => $currency
+    ];
+
+    $api->order->create($orderData);
+
 // Getting all language variables into array as global variable
 $i=1;
 $statement = $pdo->prepare("SELECT * FROM tbl_language");
@@ -17,10 +33,11 @@ foreach ($result as $row) {
 <?php
 if( !isset($_REQUEST['msg']) ) {
 	if(empty($_POST['final_total'])) {
-		header('location: ../../chckout.php');
+		header('location: ../../checkout.php');
 	} else {
 		$payment_date = date('Y-m-d H:i:s');
-	    $payment_id = time();
+	    // $payment_id = time();
+		$payment_id = $orderID;
 
 	    $statement = $pdo->prepare("INSERT INTO tbl_payment (   
 	                            customer_id,
@@ -128,27 +145,12 @@ if( !isset($_REQUEST['msg']) ) {
 	    }
 	    unset($_SESSION['cart_p_id']);
 	    unset($_SESSION['cart_p_qty']);
-
+		unset($_SESSION['cart_p_current_price']);
 	    unset($_SESSION['cart_p_name']);
 	    unset($_SESSION['cart_p_featured_photo']);
 		unset($_SESSION['cart_p_current_price']);
 
-		global $FinalAmt;
-
-		$FinalAmt = $_POST['final_total'];
-
+		header('location: ../../payment_success.php');
 	}
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Created</title>
-</head>
-<body>
-    <h1>Order Created Successfully</h1>
-</body>
-</html>
