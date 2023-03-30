@@ -235,60 +235,71 @@ if(!isset($_SESSION['cart_p_id'])) {
 		                		
 	                            <div class="row">
 
-	                                <div class="col-md-12 form-group">
+	                                <!-- <div class="col-md-12 form-group">
 	                                    <label for=""><?php echo LANG_VALUE_34; ?> *</label>
 	                                    <select name="payment_method" class="form-control select2" id="advFieldsStatus">
 	                                        <option value=""><?php echo LANG_VALUE_35; ?></option>
 	                                        <option value="RazorPay"><?php echo LANG_VALUE_36; ?></option>
 	                                        <option value="Cash on Delivery"><?php echo LANG_VALUE_38; ?></option>
 	                                    </select>
-	                                </div>
+	                                </div> -->
 
-                                    <!-- <form class="paypal" action="<?php echo BASE_URL; ?>payment/paypal/payment_process.php" method="post" id="paypal_form" target="_blank">
-                                        <input type="hidden" name="cmd" value="_xclick" />
-                                        <input type="hidden" name="no_note" value="1" />
-                                        <input type="hidden" name="lc" value="UK" />
-                                        <input type="hidden" name="currency_code" value="USD" />
-                                        <input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynow_LG.gif:NonHostedGuest" />
+                                    
 
-                                        <input type="hidden" name="final_total" value="<?php echo $final_total; ?>">
-                                        <div class="col-md-12 form-group">
-                                            <input type="submit" class="btn btn-primary" value="<?php echo LANG_VALUE_46; ?>" name="form1">
-                                        </div>
-                                    </form> -->
+                                    <div class="col-md-12 form-group">
+                                        <input type="button" id="rzp-button1" class="btn btn-primary" onclick="pay_now()" value="<?php echo LANG_VALUE_46; ?>" name="rzp-button1">
+                                    </div>
 
-                                    <form class="RazorPay" action="<?php echo BASE_URL; ?>payment/razorpay/order_process.php" method="post" id="RazorPay_form" target="_blank">
-                                        <input type="hidden" name="final_total" value="<?php echo "$final_total"?>" />
-                                        <input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynow_LG.gif:NonHostedGuest" />
-                                        <div class="col-md-12 form-group">
-                                            <input type="submit" class="btn btn-primary" value="<?php echo LANG_VALUE_46; ?>" name="form1">
-                                        </div>
-                                    </form>
+                                    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+                                    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                                    <script>
+                                        function pay_now(){
+                                            var options = {
+                                                "key": "rzp_test_ZRnhjkjRy355YS", // Enter the Key ID generated from the Dashboard
+                                                "amount": "<?php echo $amt = $final_total*100;?>", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise.
+                                                "currency": "INR",
+                                                "name": "ABC Chicken-Center",
+                                                "description": "Order Payment",
+                                                "image": "https://ak.dream-dev.in/assets/uploads/logo.png",
 
-
-                                    <!-- <form action="payment/bank/init.php" method="post" id="bank_form">
-                                        <input type="hidden" name="amount" value="<?php echo $final_total; ?>">
-                                        <div class="col-md-12 form-group">
-                                            <label for=""><?php echo LANG_VALUE_43; ?></span></label><br>
-                                            <?php
-                                            $statement = $pdo->prepare("SELECT * FROM tbl_settings WHERE id=1");
-                                            $statement->execute();
-                                            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-                                            foreach ($result as $row) {
-                                                echo nl2br($row['bank_detail']);
+                                                "handler": function (response){
+                                                    jQuery.ajax({
+                                                        type : 'post',
+                                                        url  : 'process.php',
+                                                        data : "payment_id="+response.razorpay_payment_id+"&amt="+<?php echo $amt = $final_total*100;?>+"&name="+"<?php echo $_SESSION['customer']['cust_b_name'];?>",
+                                                        success:function(result){
+                                                            window.location.href = "payment_success.php";
+                                                        }
+                                                    });
+                                                },
+                                                "prefill": {
+                                                    "name": "<?php echo $_SESSION['customer']['cust_b_name'];?>",
+                                                    "email": "<?php echo $_SESSION['customer']['cust_email'];?>",
+                                                    "contact": "<?php echo $_SESSION['customer']['cust_b_phone'];?>"
+                                                },
+                                                "notes": {
+                                                    "address": "Razorpay Corporate Office"
+                                                },
+                                                "theme": {
+                                                    "color": "#3399cc"
+                                                }
+                                            };
+                                            var rzp1 = new Razorpay(options);
+                                            rzp1.on('payment.failed', function (response){
+                                                    alert(response.error.code);
+                                                    alert(response.error.description);
+                                                    alert(response.error.source);
+                                                    alert(response.error.step);
+                                                    alert(response.error.reason);
+                                                    alert(response.error.metadata.order_id);
+                                                    alert(response.error.metadata.payment_id);
+                                            });
+                                            document.getElementById('rzp-button1').onclick = function(e){
+                                                rzp1.open();
+                                                e.preventDefault();
                                             }
-                                            ?>
-                                        </div>
-                                        <div class="col-md-12 form-group">
-                                            <label for=""><?php echo LANG_VALUE_44; ?> <br><span style="font-size:12px;font-weight:normal;">(<?php echo LANG_VALUE_45; ?>)</span></label>
-                                            <textarea name="transaction_info" class="form-control" cols="30" rows="10"></textarea>
-                                        </div>
-                                        <div class="col-md-12 form-group">
-                                            <input type="submit" class="btn btn-primary" value="<?php echo LANG_VALUE_46; ?>" name="form3">
-                                        </div>
-                                    </form> -->
-
-
+                                        }
+                                    </script>
 	                                
 	                            </div>
 		                            
